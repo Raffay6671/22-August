@@ -6,9 +6,10 @@ import { VpnUser } from '../../types/VpnUser';
 const TableOne = () => {
   const [vpnData, setVpnData] = useState(null);
   const fakeVpnUsers: VpnUser[] = vpnData;
-  const [setAccordion, Accordion] = useState<number | null>(null);
+  const [accordion, setAccordion] = useState<number | null>(null);
+
   const handleAccordion = (index: number) => {
-    Accordion((prev) => {
+    setAccordion((prev) => {
       if (prev === index) {
         return null;
       } else {
@@ -28,11 +29,18 @@ const TableOne = () => {
 
     fetchData();
   }, []);
-  if (!vpnData) {
-    return <div>Loading...</div>;
-  }
 
-  console.log('ALL THE DATA', fakeVpnUsers);
+  // console.log('af', activeUsers);
+  const totalUserPerServer = (server) => {
+    let activeUsers = 0;
+    server.list.forEach((user) => {
+      const activeUserCount =
+        (user.latest_stat && Number(user.latest_stat.no_of_active_users)) || 0;
+      activeUsers += activeUserCount;
+    });
+    console.log(`Active Users for ${server.cname}:`, activeUsers);
+    return activeUsers;
+  };
 
   return (
     <>
@@ -80,10 +88,11 @@ const TableOne = () => {
                 }`}
                 key={user.id}
               >
-                <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
-                  <p className="text-meta-3 ">{user.country}</p>
-                </div>
-
+                {key === 0 && ( // Only render the country name for the first user in each server's list
+                  <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
+                    <p className="text-meta-3 ">{user.country}</p>
+                  </div>
+                )}
                 {vpnData?.servers?.map((server) => {
                   const totalServers = server.list.length;
                   console.log(
@@ -92,27 +101,37 @@ const TableOne = () => {
                   );
                 })}
 
-                <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
-                  <p className="text-meta-3 ">{server.list.length}</p>
-                </div>
+                {key === 0 && ( // Only render the country name for the first user in each server's list
+                  <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
+                    <p className="text-meta-3 ">{server.list.length}</p>
+                  </div>
+                )}
+                {key === 0 && ( // Only render the country name for the first user in each server's list
+                  <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
+                    <p className="text-meta-3 ">
+                      {totalUserPerServer(server) ?? 'NAN'}
+                    </p>
+                    {/* <p className="text-meta-3 ">{totalUserPerServer(server)}</p> */}
+                  </div>
+                )}
 
-                <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
-                  <p className="text-meta-3 ">NAN</p>
-                </div>
-
-                <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
-                  <p className="text-meta-3 ">NAN</p>
-                </div>
-
-                <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
-                  <Accordian
-                    setAccordion={setAccordion}
-                    index={key}
-                    vpnData={vpnData}
-                    handleAccordion={handleAccordion}
-                    accordion={setAccordion === key}
-                  />
-                </div>
+                {key === 0 && ( // Only render the country name for the first user in each server's list
+                  <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
+                    <p className="text-meta-3 ">NAN</p>
+                  </div>
+                )}
+                {key === 0 && (
+                  <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
+                    <Accordian
+                      setAccordion={setAccordion}
+                      index={key}
+                      vpnData={vpnData}
+                      handleAccordion={handleAccordion}
+                      accordion={accordion === key}
+                      fakeVpnUsers={server.list} // Pass the correct data here
+                    />
+                  </div>
+                )}
               </div>
             )),
           )}

@@ -33,7 +33,7 @@
     padding: 8px; /* Further reduced padding for tighter content */
     background-color: #1f2229;
     color: #00ff00;
-    width: 700px; /* Allow it to take up full available space */
+    width: 500%; /* Allow it to take up full available space */
     box-sizing: border-box;
     border: 1px solid #ccc;
     border-radius: 5px;
